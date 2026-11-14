@@ -287,7 +287,7 @@ def classify(it, have_7z):
             return
         if it.kernel.endswith('/linux26') or iso.exists('proxmox') and iso.exists('.cd-info'):
             it.family, it.group = 'proxmox', 'install'
-        elif 'boot=casper' in a:
+        elif 'boot=casper' in a or '/casper/' in it.kernel:  # Ubuntu 24.04+ media omit boot=casper
             it.family, it.group = 'casper', 'live'
         elif 'boot=live' in a:
             it.family = 'livedeb'

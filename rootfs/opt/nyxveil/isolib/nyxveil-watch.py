@@ -19,6 +19,7 @@ Configuration (environment, all optional):
   NYX_SETTLE    seconds a file must stay unchanged     (default 30)
   NYX_RESCAN    seconds between full safety re-runs    (default 21600 = 6 h)
 """
+import json
 import os
 import re
 import shlex
@@ -65,6 +66,24 @@ def snapshot():
         if os.path.isfile(os.path.join(ISO_DIR, n)):
             snap[n] = (st.st_size, st.st_mtime_ns)
     return snap
+
+
+def unextracted(snap):
+    """ISOs the library has not extracted yet (or that changed since), per the generator's manifest."""
+    out = OUT_DIR or os.path.join(ISO_DIR, '_nyxveil')
+    try:
+        with open(os.path.join(out, 'manifest.json')) as fh:
+            manifest = json.load(fh)
+    except (OSError, ValueError):
+        manifest = {}
+    todo = []
+    for n, (size, mtime_ns) in snap.items():
+        if n == TITLES or not n.lower().endswith('.iso'):
+            continue
+        key = manifest.get(n, {}).get('key', '')
+        if key.split(':')[1:] != [str(size), str(mtime_ns // 10**9)]:
+            todo.append(n)
+    return sorted(todo)
 
 
 def run(copying=(), preparing=()):
@@ -150,8 +169,10 @@ def main():
                     log('+  %s (%.1f GB) copied - adding it' % (n, stable[n][0] / 1e9))
             for n in gone:
                 log('-  %s removed - dropping it' % n)
-            if new and done is not None:
-                run(preparing=new)  # menu shows "being prepared" while the extraction runs
+            # publish the menu straight away, with not-yet-extracted ISOs shown as "being prepared"
+            pending = new if done is not None else unextracted(stable)
+            if pending:
+                run(preparing=pending)
             ok = run()
             last_full = now
             if ok:
