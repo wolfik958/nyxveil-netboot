@@ -1,0 +1,21 @@
+# Nyxveil netboot - netboot.xyz + Nyxveil theme + drag-and-drop ISO library, in one container.
+#   docker compose up -d
+# then point your DHCP server's PXE boot file at this host (see README.md).
+services:
+  nyxveil-netboot:
+    image: ghcr.io/wolfik958/nyxveil-netboot:latest
+    container_name: nyxveil-netboot
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Prague
+      # NYX_PORT: "8080"        # only if you change the host side of the 80/tcp mapping below
+      # NYX_THEME: "0"          # plain netboot.xyz look, keep only the ISO library
+      # NYX_SMB_LIB: '\\192.168.1.10\netboot\nyxveil'   # enables Windows installers (see README)
+    volumes:
+      - ./config:/config                    # netboot.xyz menus and settings
+      - /path/to/your/isos:/assets/iso:ro   # drop ISOs here; read-only is fine
+      - ./nyxveil:/assets/nyxveil           # ISO library: extracted boot files + menu
+    ports:
+      - "3000:3000"     # netboot.xyz web UI
+      - "69:69/udp"     # TFTP
+      - "80:80"         # HTTP: boot files and ISOs

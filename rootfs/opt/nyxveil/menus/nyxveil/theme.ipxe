@@ -1,0 +1,21 @@
+#!ipxe
+# Nyxveil stage II — themes netboot.xyz's own iPXE console.
+# Chained from local-vars.ipxe, which netboot.xyz runs right before loading menu.ipxe.
+# Every command ends in "||" so a client without framebuffer/PNG support just keeps the stock look.
+
+console --x 1024 --y 768 --picture tftp://${tftp-server}/nyxveil/stage2.png --left 64 --right 64 --top 96 --bottom 80 --keep ||
+
+colour --rgb 0x0a0e1a 0 ||
+colour --rgb 0xc0392b 1 ||
+colour --rgb 0xc9a84c 3 ||
+colour --rgb 0x4fc3c3 6 ||
+colour --rgb 0xd8dde6 7 ||
+
+cpair --foreground 7 --background 9 0 ||
+cpair --foreground 7 --background 9 1 ||
+cpair --foreground 0 --background 3 2 ||
+cpair --foreground 6 --background 9 3 ||
+cpair --foreground 0 --background 6 4 ||
+cpair --foreground 7 --background 1 5 ||
+cpair --foreground 6 --background 9 6 ||
+cpair --foreground 0 --background 3 7 ||
