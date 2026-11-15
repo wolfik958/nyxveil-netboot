@@ -35,6 +35,8 @@ Then point PXE clients at this host from your DHCP server:
 - **UEFI x86_64 clients:** boot file `netboot.xyz-snp.efi`. `netboot.xyz.efi` also works, but it can lose the USB keyboard on some PCs.
 - **Legacy BIOS clients:** `netboot.xyz.kpxe`. These get stock netboot.xyz plus the ISO library under **Custom URL Menu**.
 
+If both BIOS and UEFI machines boot from the same network, the DHCP server has to choose the file per client, from the architecture each client reports in option 93. [docs/dhcp.md](docs/dhcp.md) has example configurations for MikroTik RouterOS and Cisco IOS. They're examples only: other devices and software versions configure this differently.
+
 Secure Boot must be off on the clients. The GRUB front menu is unsigned.
 
 ## How the ISO library works
